@@ -1,0 +1,87 @@
+[% IF states %]
+<script type="text/javascript">
+  var row = document.getElementById("form").insertRow(11);
+
+  var header = document.createElement("TH");
+  header.appendChild(document.createTextNode("Flag Comments:"));
+  row.appendChild(header);
+  var td = document.createElement("TD");
+  td.appendChild(document.createTextNode("add text into the comment box when flag is changed to a state"));
+  row.appendChild(td);
+
+[% i = 0 %]
+[% FOREACH state = states %]
+  var row = document.getElementById("form").insertRow(12 + [% i %]);
+
+  var header = document.createElement("TH");
+  header.innerHTML = "&nbsp;";    
+  row.appendChild(header);
+
+  var td = document.createElement("TD");
+
+  var text = 'for [% state %]</br><textarea id="ftc_text_[% i %]" name="ftc_text_[% i %]" cols="50" rows="2">[% texts.${state} %]</textarea>'; 
+
+  td.innerHTML = text;
+  row.appendChild(td);
+
+[% i = i+1 %]
+[% END %]
+</script>
+[% END %]
+[% IF flag_type_comments %]
+<script type="text/javascript">
+var comment = document.getElementById('comment');
+
+var selects = document.querySelectorAll( 'select[id^=flag_type-]' );
+
+for ( var i = 0, length = selects.length; i < length; i++ ) {
+    selects[i].addEventListener('change',onFlagTypeChange,false);
+}
+
+var selects = document.querySelectorAll( 'select[id^=flag-]' );
+
+for ( var i = 0, length = selects.length; i < length; i++ ) {
+    selects[i].addEventListener('change',onFlagChange,false);
+}
+
+function onFlagTypeChange ( event ) {
+  tid = event.target.id.split("-")[1];
+
+  [% notfirst = 0 %]
+
+  [% FOREACH ft_comment = flag_type_comments %]
+  [% IF notfirst == 1 %]else [% END %]if ( tid == "[% ft_comment.flagtype %]" && event.target.value == "[% ft_comment.on_status %]" )
+    prependComment("[% ft_comment.comment_prepend %]");
+    [% notfirst = 1 %]
+  [% END %]
+}
+
+function onFlagChange ( event ) {
+  fid = event.target.id.split("-")[1];
+
+  [% notfirst = 0 %]
+
+  [% FOREACH type = flag_types -%]
+     [% FOREACH flag = type.flags %]
+        [% FOREACH ft_comment = flag_type_comments %]
+           [% IF ft_comment.flagtype == type.id %]
+           [% IF notfirst == 1 %]else [% END %]if( fid == "[% flag.id %]" && event.target.value == "[% ft_comment.on_status %]" ) 
+     prependComment("[% ft_comment.comment_prepend %]");
+           [% notfirst = 1 %]
+           [% END %]
+        [% END %]
+     [% END %]
+  [% END %]
+}
+
+function prependComment ( text ) {
+  if ( comment.value != "" ) {
+     text = text + "\n\n" + comment.value;
+  }
+
+  comment.value = text;
+  alert("Additional info has been pasted into the comment box.");
+}
+
+</script>
+[% END %]
