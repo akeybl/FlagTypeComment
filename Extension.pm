@@ -28,7 +28,7 @@ use Bugzilla::FlagType;
 use constant NAME => 'FlagTypeComment';
 our $VERSION = '0.01';
 
-my(@attachtemplates) = ("attachment/edit.html.tmpl");
+my(@attachtemplates) = ("attachment/edit.html.tmpl","attachment/create.html.tmpl");
 my(@bugtemplates) = ("bug/comments.html.tmpl");
 my(@admintemplates) = ("admin/flag-type/edit.html.tmpl","admin/flag-type/list.html.tmpl");
 my(@states) = ("?","+","-");
@@ -66,7 +66,12 @@ sub template_before_process {
     my $flagtypes;
 
     if ( grep {$_ eq $file} @attachtemplates ) {
-       $flagtypes = $vars->{'attachment'}->flag_types;
+       if (Bugzilla->cgi->param('action') eq "enter" ) {
+          $flagtypes = $vars->{'flag_types'};
+       }
+       else {
+          $flagtypes = $vars->{'attachment'}->flag_types;
+       }
     } elsif ( grep {$_ eq $file} @bugtemplates ) {
        $flagtypes = $vars->{'bug'}->flag_types;
     }
